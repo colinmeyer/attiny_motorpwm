@@ -7,12 +7,26 @@
 
 #define F_CPU 9.6E6L / 8 // CPU Freq. Must come before delay.h include. 9.6MHz / 8
 #include <util/delay.h>
+#include <util/delay_basic.h>
 
 #include <avr/io.h>
 
 
+uint8_t lfsr_next() {
+    static uint8_t lfsr = (uint8_t)0xcb;
+    lfsr = (lfsr >> 1) ^ (-(uint8_t)(lfsr & 1) & 0b10111000);
+    return lfsr;
+}
 
+void delay_some_ms(uint8_t loops) 
+{ 
+  /* Prevents the use of floating point libraries. Delaying in groups of 
+     10ms increases accuracy by reducing the time overhead for each loop 
+     interation of the while.                                            */ 
 
+   while (loops--) 
+     _delay_ms(3); 
+}
 
 int main(void) {
     //====================================================
@@ -39,13 +53,12 @@ int main(void) {
     //====================================================
     
 
-    static uint8_t pwm;
 
     while(1) {
-        _delay_ms(450);
+        uint8_t rand = lfsr_next();
+        OCR0A = rand & 0x7f; // just the lower 7 bits - up to 50% 
 
-        pwm += 0x40;
-        OCR0A = pwm;
+        delay_some_ms(rand);
     }
 
     return 0;
