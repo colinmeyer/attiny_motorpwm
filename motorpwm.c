@@ -18,12 +18,7 @@ uint8_t lfsr_next() {
     return lfsr;
 }
 
-void delay_some_ms(uint8_t loops) 
-{ 
-  /* Prevents the use of floating point libraries. Delaying in groups of 
-     10ms increases accuracy by reducing the time overhead for each loop 
-     interation of the while.                                            */ 
-
+void delay_some_ms(uint8_t loops) { 
    while (loops--) 
      _delay_ms(3); 
 }
